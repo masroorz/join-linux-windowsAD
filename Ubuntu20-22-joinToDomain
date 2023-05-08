@@ -1,0 +1,129 @@
+This is specifically for Ubuntu workstations - working on Ubuntu 20-22. 
+Credit: https://zmatech.com/how-to-join-ubuntu-22-04-to-active-directory/?unapproved=99&moderation-hash=e6e09c725c0d876408cd35c00971dc0d#comment-99
+
+Edit the file at:
+
+sudo nano /etc/hosts
+
+
+127.0.0.1 localhost 
+127.0.0.1 Ubuntu-WS.xyz.dc.net Ubuntu-WS
+
+Once done, save the file and exit. 
+
+Now, install the following packages on the Ubuntu workstation / VM. 
+
+sudo apt-get -y install realmd sssd sssd-tools libnss-sss libpam-sss adcli samba-common-bin oddjob oddjob-mkhomedir packagekit 
+
+Once done, run the following command to discover your Domain controller. In this example we use XYZ.DC.Net 
+
+realm -v discover XYZ.DC.Net  
+
+The result will be something similar to below
+
+check the output if it contains XYZ.DC.Net 
+XYZ.DC.Net 
+  type: kerberos
+  realm-name: XYZ.DC.Net 
+  domain-name: xyz.dc.net
+  configured: no
+  server-software: active-directory
+  client-software: sssd
+  required-package: sssd-tools
+  required-package: sssd
+  required-package: libnss-sss
+  required-package: libpam-sss
+  required-package: adcli
+  required-package: samba-common-bin
+  login-formats: %U
+  login-policy: allow-permitted-logins
+  permitted-logins: 
+  permitted-groups:
+
+
+Now, run the following command, replace domain-admin-account with your domain admin account
+
+realm join -U domain-admin-account@XYZ.DC.Net XYZ.DC.Net 
+
+The command will return an empty string if joined to the domain -- as as success. 
+Once joined to the domain, then edit the following file
+
+sudo nano /etc/sssd/sssd.conf
+
+Modify the following values in the sssd.conf file 
+
+access_provider = simple    (Replace ad with simple)
+use_fully_qualified_names = False (Replace True with False)
+
+
+similar to below: 
+
+[sssd]
+domains = xyz.dc.net
+config_file_version = 2
+services = nss, pam
+
+[domain/xyz.dc.net]
+default_shell = /bin/bash
+krb5_store_password_if_offline = True
+cache_credentials = True
+krb5_realm = XYZ.DC.Net
+realmd_tags = manages-system joined-with-adcli
+id_provider = ad
+fallback_homedir = /home/%u@%d
+ad_domain = xyz.dc.net
+use_fully_qualified_names = False
+ldap_id_mapping = True
+access_provider = simple
+
+Save and exit the file.
+
+Now enable, and restart the sssd service.
+
+sudo systemctl enable sssd
+sudo systemctl restart sssd
+
+
+Enable home directory for domain users -- two ways 
+
+1) with the following command, if a menu showed up, select * mkhomedir
+
+sudo  pam-auth-update –enable mkhomedir
+
+2) The above command can be achieved by the command below :
+
+sudo nano /etc/pam.d/common-session
+
+Add the following line in this file below the line session optional pam_sss.so
+
+session required pam_mkhomedir
+
+Once the above is done, test if Linux workstation is joined to the domain with the following command
+
+realm list
+
+and you will see something similar :
+
+xyz.dc.net
+  type: kerberos
+  realm-name: XYZ.DC.Net
+  domain-name: xyz.dc.net
+  configured: kerberos-member
+  server-software: active-directory
+  client-software: sssd
+  required-package: sssd-tools
+  required-package: sssd
+  required-package: libnss-sss
+  required-package: libpam-sss
+  required-package: adcli
+  required-package: samba-common-bin
+  login-formats: %U
+  login-policy: allow-permitted-logins
+  permitted-logins: 
+  permitted-groups:
+
+In the above, notice the following line 
+ configured: kerberos-member -- indicates that your Linux Workstation is now joined to the Windows AD. 
+ 
+Try logging on your Linux VM /workstation with your domain account without @xyz.dc.net, you should be good to go. 
+
