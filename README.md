@@ -4,7 +4,8 @@ There are two processes
 - Automated
 
 The regular manual process has separate files for both CentOS/RHEL, and Ubuntu. 
-The automate process includes both operating systems (CentOS/RHEL, and Ubuntu) in the script. 
+The automate process is in a separate file (join2domainAutomate.sh) includes both operating systems (CentOS/RHEL, and Ubuntu) in the script. 
+Please read through the file, and provide your domain name in the script. 
 
 
 Join Linux desktop, server to Windows AD 
