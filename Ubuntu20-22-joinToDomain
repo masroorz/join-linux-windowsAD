@@ -1,5 +1,6 @@
-This is specifically for Ubuntu workstations - working on Ubuntu 20-22. 
-Credit: https://zmatech.com/how-to-join-ubuntu-22-04-to-active-directory/?unapproved=99&moderation-hash=e6e09c725c0d876408cd35c00971dc0d#comment-99
+# Manual process
+# This is specifically for Ubuntu workstations - working on Ubuntu 20-22. 
+# Credit: https://zmatech.com/how-to-join-ubuntu-22-04-to-active-directory/?unapproved=99&moderation-hash=e6e09c725c0d876408cd35c00971dc0d#comment-99
 
 Edit the file at:
 
