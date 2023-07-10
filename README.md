@@ -1,4 +1,12 @@
 # join-linux-windowsAD
+There are two processes 
+- Regular / manual process
+- Automated
+
+The regular manual process has separate files for both CentOS/RHEL, and Ubuntu. 
+The automate process includes both operating systems (CentOS/RHEL, and Ubuntu) in the script. 
+
+
 Join Linux desktop, server to Windows AD 
 This is a working script that can be used on the following distros
 - CentOS (7/8)
