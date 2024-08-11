@@ -1,28 +1,74 @@
-# join-linux-windowsAD
-There are two processes 
-- Regular / manual process
-- Automated
+# README for `jointodomain.sh`
 
-The regular manual process has separate files for both CentOS/RHEL, and Ubuntu. 
-The automate process is in a separate file (join2domainAutomate.sh) includes both operating systems (CentOS/RHEL, and Ubuntu) in the script. 
-Please read through the file, and provide your domain name in the script. 
+## Overview
 
+The `jointodomain.sh` script is designed to seamlessly join a Linux machine to a Windows Active Directory (AD) domain. It is compatible with Ubuntu, CentOS, and RedHat distributions and is intended for use by domain administrators. The script handles the installation of required packages, configuration of services, and joining the machine to the specified domain.
 
-Join Linux desktop, server to Windows AD 
-This is a working script that can be used on the following distros
-- CentOS (7/8)
-- Ubuntu (18-22) 
-- openSuse - not coded
+## Prerequisites
 
-There's one main script file that's universal, runs on any of the distros (Ubuntu / CentOS) and joins it to the domain. 
-There's also two different script files that I created then joined them both into one script. 
+- **Operating Systems Supported:**
+  - Ubuntu
+  - CentOS
+  - RedHat
+  - (Future support for openSUSE-Leap is planned)
 
-I used various sources for this, the one that really worked is 
-https://zmatech.com/how-to-join-ubuntu-22-04-to-active-directory/?unapproved=99&moderation-hash=e6e09c725c0d876408cd35c00971dc0d#comment-99
+- **User Requirements:**
+  - You must have domain admin credentials to join the domain.
 
-There are two different approaches for both CentOS, and Ubuntu depending on your needs. 
-I used the process here to only join the Linux workstation/server to the Windows AD -- that means, all AD authenticated users will be able to login to the Linux machine. 
+## Instructions
 
-if you like to create separate security groups in AD so only certain users can login to the Linux machines, please feel free to add your comments as it's a work in progress. 
+1. **Run the Script:**
+   - Use the following command to run the script:
+     ```bash
+     sudo bash jointodomain.sh
+     ```
+   - Follow the on-screen prompts, especially when entering the domain admin account.
 
+2. **Log Files:**
+   - All logs are captured in `join2domainLOG.txt` for debugging and auditing purposes.
 
+## Script Workflow
+
+1. **Log Initialization:**
+   - The script starts by redirecting all output to `join2domainLOG.txt`.
+
+2. **System Information:**
+   - The script identifies the distribution type (`Ubuntu`, `CentOS`, `RedHat`) and adapts its behavior accordingly.
+
+3. **Repository Update:**
+   - For Ubuntu: `apt-get update`
+   - For CentOS/RedHat: `yum makecache`
+
+4. **Package Installation:**
+   - Installs the necessary packages (`realmd`, `sssd`, `adcli`, etc.) depending on the distribution.
+
+5. **Domain Discovery:**
+   - The script checks if the specified domain is discoverable.
+
+6. **Domain Join Status:**
+   - Checks if the machine is already joined to the domain. If it is, the script exits. If not, it proceeds to join the domain.
+
+7. **Joining the Domain:**
+   - Prompts for the domain admin credentials and attempts to join the machine to the domain.
+
+8. **Service Configuration:**
+   - Configures and enables `SSSD` service to manage domain authentication.
+   - Updates `/etc/sssd/sssd.conf` to adjust configurations.
+
+## Error Handling
+
+- The script includes error handling for package installation, repository updates, and domain joining. If any step fails, the script logs the error and exits gracefully, providing relevant details in the log file.
+
+## Improvements/Updates
+
+- The script is designed to be generic and will be updated to support more distributions in the future.
+- Future enhancements might include support for openSUSE-Leap and additional error handling features.
+
+## Known Issues
+
+- The script currently supports only `Ubuntu`, `CentOS`, and `RedHat`. Other distributions may not work correctly.
+- Ensure the machine has network connectivity to the AD domain before running the script.
+
+## Support
+
+For issues or questions, please refer to the log file `join2domainLOG.txt` for troubleshooting or contact your system administrator.
